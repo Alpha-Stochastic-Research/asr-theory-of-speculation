@@ -93,7 +93,7 @@ using **5,000 Monte Carlo trajectories**.
 
 | Property | Result |
 |-----------|--------|
-| Martingale Property | ✅ Verified |
+| Martingale Property | Verified |
 | Maximum Mean Error | **0.037** |
 | Variance Scaling Error | **1.56 %** |
 | Negative Prices | Theoretically possible (not observed in simulation) |
@@ -118,9 +118,9 @@ d=\frac{P_0-K}{\sigma\sqrt{T}}
 
 | Test | Result |
 |------|--------|
-| Closed-form vs Monte Carlo (2M paths) | ✅ Error = **0.0008** |
-| ATM √T Scaling | ✅ Exact |
-| Comparison with Black–Scholes | ✅ Maximum Difference = **0.0048** |
+| Closed-form vs Monte Carlo (2M paths) | Error = **0.0008** |
+| ATM √T Scaling | Exact |
+| Comparison with Black–Scholes | Maximum Difference = **0.0048** |
 
 ---
 
@@ -129,7 +129,7 @@ d=\frac{P_0-K}{\sigma\sqrt{T}}
 Clone the repository
 
 ```bash
-git clone https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git
+git clone [https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git)
 
 cd asr-bachelier-1900
 ```
