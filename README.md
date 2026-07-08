@@ -131,7 +131,7 @@ Clone the repository
 ```bash
 git clone [https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git)
 
-cd asr-bachelier-1900
+cd asr-theory-of-speculation
 ```
 
 Install the required packages
