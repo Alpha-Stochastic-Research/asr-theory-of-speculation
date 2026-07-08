@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo/logo.png" width="180">
+<img src="logo & cover/ASR_logo_icone.png" width="180">
 
 # Bachelier (1900): *Theory of Speculation*
 
