@@ -1,76 +1,174 @@
-# Bachelier 1900 — Reproduction
+<div align="center">
 
-Reproduction numérique des résultats de Louis Bachelier, *Théorie de la spéculation* (1900),
-et version corrigée du document LaTeX qui présente ce papier.
+<img src="assets/logo/logo.png" width="170">
 
-## Contenu du repo
+# Bachelier (1900): *Theory of Speculation*
 
-```
+### A Reproducible Implementation of the Foundations of Quantitative Finance
+
+**Alpha Stochastic Research (ASR)**  
+*Independent Quantitative Finance Research Laboratory*
+
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org/)
+[![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=flat-square&logo=scipy&logoColor=white)](https://scipy.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=flat-square)](https://matplotlib.org/)
+[![LaTeX](https://img.shields.io/badge/LaTeX-008080?style=flat-square&logo=latex&logoColor=white)](https://www.latex-project.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-success?style=flat-square)](LICENSE)
+
+[![Website](https://img.shields.io/badge/Website-asr--lab.online-00C3FF?style=flat-square)](https://asr-lab.online)
+[![Email](https://img.shields.io/badge/Research-research@asr--lab.online-0A2540?style=flat-square&logo=gmail&logoColor=white)](mailto:research@asr-lab.online)
+
+</div>
+
+---
+
+# Overview
+
+This repository provides a **fully reproducible implementation** of Louis Bachelier's pioneering 1900 doctoral thesis, *Théorie de la Spéculation*, widely recognized as the birth of **modern quantitative finance**.
+
+Developed by **Alpha Stochastic Research (ASR)**, this project bridges historical financial mathematics with modern computational methods through rigorous numerical experiments, mathematical derivations, Monte Carlo simulations, and reproducible Python implementations.
+
+The repository also includes a corrected and fully compilable **LaTeX edition** of the original paper.
+
+---
+
+# Repository Structure
+
+```text
 bachelier-1900-reproduction/
+│
 ├── README.md
+├── LICENSE
 ├── requirements.txt
+│
 ├── src/
-│   ├── brownian_motion.py      # marche aléatoire arithmétique + martingale
-│   └── option_pricing.py       # formule de pricing d'options de Bachelier
+│   ├── brownian_motion.py
+│   └── option_pricing.py
+│
 ├── figures/
 │   ├── fig1_random_walk_martingale.png
 │   └── fig2_option_pricing.png
-└── paper/
-    ├── bachelier_paper_corrige.tex   # LaTeX corrigé (compile sans erreur)
-    └── bachelier_paper_corrige.pdf   # PDF compilé
+│
+├── paper/
+│   ├── bachelier_paper_corrige.tex
+│   └── bachelier_paper_corrige.pdf
+│
+└── assets/
+    └── logo/
 ```
 
-## Résultats reproduits
+---
 
-### 1. Propriété de martingale (`src/brownian_motion.py`)
-Bachelier modélise le prix comme `P_t = P_0 + sigma * W_t`. On simule 5000
-trajectoires (250 pas, sigma=2) et on vérifie :
+# Key Features
 
-- `E[P_t] ≈ P_0` pour tout `t` — écart max mesuré : **0.037** sur une échelle de prix ~100
-  (« l'espérance mathématique du spéculateur est nulle »)
-- `Var[P_t] = sigma² · t` — erreur relative mesurée : **1.56 %** (bruit Monte Carlo)
-- Probabilité de prix négatif à `t=1` : **0.000 %** dans cet échantillon, mais non nulle
-  analytiquement — c'est précisément la limite structurelle du modèle arithmétique
+- Reproduction of Bachelier's Arithmetic Brownian Motion
+- Martingale Property Verification
+- Closed-Form Option Pricing Formula
+- Monte Carlo Validation
+- Numerical Experiments
+- Publication-Quality Figures
+- Corrected LaTeX Manuscript
+- Fully Reproducible Research
 
-### 2. Formule de pricing d'options (`src/option_pricing.py`)
-Sous le modèle de Bachelier, le prix d'un call européen est :
+---
 
-```
-C = (P0 - K) * N(d) + sigma * sqrt(T) * phi(d),   d = (P0 - K) / (sigma * sqrt(T))
-```
+# Numerical Validation
 
-Vérifications effectuées :
+## Arithmetic Brownian Motion
 
-- **Formule fermée vs Monte Carlo** (2M tirages) : écart de **0.0008**, dans l'erreur
-  standard Monte Carlo (±0.0008) → formule validée
-- **Scaling en `sqrt(T)`** pour une option à la monnaie (`K=P0`) : erreur numérique
-  **0.00e+00** (identité exacte `C_ATM = sigma·sqrt(T)·φ(0)`)
-- **Convergence vers Black-Scholes** à faible volatilité (2 %) : écart de prix max
-  **0.0048** sur une nappe de strikes [80,120] → les deux modèles coïncident bien
-  localement, comme attendu théoriquement
+The stochastic process
 
-## Reproduire
+\[
+P_t=P_0+\sigma W_t
+\]
+
+is reproduced numerically using Monte Carlo simulations.
+
+Validation includes
+
+- Martingale property
+- Linear variance growth
+- Distributional analysis
+- Structural limitations of the arithmetic model
+
+---
+
+## Option Pricing
+
+Implementation of Bachelier's European option pricing formula together with
+
+- Closed-form evaluation
+- Monte Carlo verification
+- ATM asymptotic behaviour
+- Comparison with Black–Scholes
+
+---
+
+# Installation
 
 ```bash
+git clone https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git
+
+cd asr-bachelier-1900
+
 pip install -r requirements.txt
+```
+
+---
+
+# Usage
+
+```bash
 python src/brownian_motion.py
+
 python src/option_pricing.py
 ```
 
-## Corrections apportées au document LaTeX
+---
 
-Le `.tex` d'origine ne compilait pas. Diagnostic obtenu par compilation réelle
-avec `pdflatex` (pas une simple relecture) :
+# References
 
-| # | Problème | Gravité | Correction |
-|---|----------|---------|------------|
-| 1 | Couleur `alertRed` utilisée dans le TikZ (Fig. 1) mais jamais définie via `\definecolor` | **Erreur fatale** — 8 occurrences de `! Package xcolor Error: Undefined color` / `! Package pgfkeys Error`, compilation impossible (`pdflatex` retourne le code 1) | Ajout de `\definecolor{alertRed}{RGB}{214,40,40}` dans le bloc de couleurs |
-| 2 | Guillemets droits ASCII `"..."` utilisés à 4 endroits (`"random walk"`, la citation de Bachelier, `"fat tails"`, `"unworthy"`) | Défaut typographique — LaTeX ne convertit pas automatiquement `"` en guillemets courbes, rendu visuellement incorrect | Remplacement par les guillemets LaTeX corrects `` `` ... '' `` |
+Bachelier, L. (1900).
 
-Après correction : compilation `pdflatex` propre, **0 erreur**, PDF de 2 pages généré
-(vérifié par double passage `pdflatex` + inspection visuelle des pages rendues).
+*Théorie de la Spéculation.*
 
-## Sources
+Annales Scientifiques de l'École Normale Supérieure, **17**, 21–86.
 
-- Bachelier, L. (1900). *Théorie de la spéculation*. Annales Scientifiques de l'ENS, 17, 21-86.
-- Samuelson, P. A. (1965). *Rational Theory of Warrant Pricing*. Industrial Management Review, 6(2), 13-31.
+Samuelson, P. A. (1965).
+
+*Rational Theory of Warrant Pricing.*
+
+Industrial Management Review, **6(2)**, 13–31.
+
+---
+
+# About Alpha Stochastic Research
+
+**Alpha Stochastic Research (ASR)** is an independent quantitative finance research laboratory dedicated to advancing rigorous, transparent, and reproducible research at the intersection of
+
+- Financial Markets
+- Mathematics
+- Statistics
+- Stochastic Modelling
+- Artificial Intelligence
+
+Our mission is to bridge academic research and real-world finance through **open science**, **reproducible computational methods**, and **high-quality educational resources**.
+
+---
+
+<div align="center">
+
+**Website**
+
+https://asr-lab.online
+
+**Research Contact**
+
+research@asr-lab.online
+
+---
+
+© 2026 Alpha Stochastic Research (ASR)
+
+</div>
