@@ -49,6 +49,9 @@ bachelier-1900-reproduction/
 ├── src/
 │   ├── brownian_motion.py
 │   └── option_pricing.py
+├── .github/
+│   ├── workflows/
+│       ├── python-app.yml
 │
 ├── figures/
 │   ├── fig1_random_walk_martingale.png
