@@ -1,25 +1,17 @@
 """
-Bachelier (1900) arithmetic Brownian motion simulation.
+Bachelier arithmetic Brownian motion simulation.
 
-In "Théorie de la Spéculation", Louis Bachelier models price changes using
-an arithmetic Brownian motion:
+This script reproduces the basic price dynamics behind Louis Bachelier's
+1900 Theory of Speculation using a simple arithmetic Brownian motion model:
 
     P_t = P_0 + sigma W_t
 
-where:
-    P_0   is the initial price,
-    sigma is the arithmetic volatility,
-    W_t   is a standard Brownian motion.
+The goal is educational and reproducible:
 
-This script numerically illustrates two core properties:
-
-1. Martingale property:
-       E[P_t] = P_0
-
-2. Linear variance growth:
-       Var[P_t] = sigma^2 t
-
-The goal is to keep the code simple, readable, educational, and reproducible.
+1. Simulate Bachelier price paths.
+2. Verify the martingale property E[P_t] = P_0.
+3. Verify the variance identity Var[P_t] = sigma^2 t.
+4. Save a figure that can be used in the paper and README.
 """
 
 from pathlib import Path
@@ -28,9 +20,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# =============================================================================
-# Main simulation parameters
-# =============================================================================
+# -----------------------------------------------------------------------------
+# Baseline parameters
+# -----------------------------------------------------------------------------
 
 P0 = 100.0
 SIGMA = 2.0
@@ -40,9 +32,10 @@ N_PATHS = 5_000
 SEED = 42
 
 
-# =============================================================================
+# -----------------------------------------------------------------------------
 # Simulation functions
-# =============================================================================
+# -----------------------------------------------------------------------------
+
 
 def simulate_bachelier_paths(
     p0=P0,
@@ -53,15 +46,7 @@ def simulate_bachelier_paths(
     seed=SEED,
 ):
     """
-    Simulate price paths under the Bachelier arithmetic Brownian motion model.
-
-    The model is:
-
-        P_t = P_0 + sigma W_t
-
-    Over a small time interval dt, price increments satisfy:
-
-        dP_t ~ N(0, sigma^2 dt)
+    Simulate price paths under the Bachelier model.
 
     Parameters
     ----------
@@ -70,20 +55,19 @@ def simulate_bachelier_paths(
     sigma : float
         Arithmetic volatility.
     maturity : float
-        Time horizon.
+        Final time horizon.
     n_steps : int
         Number of time steps.
     n_paths : int
-        Number of simulated Monte Carlo paths.
+        Number of simulated paths.
     seed : int
         Random seed used for reproducibility.
 
     Returns
     -------
-    t_grid : np.ndarray
-        Time grid.
-    paths : np.ndarray
-        Simulated price paths with shape (n_paths, n_steps + 1).
+    tuple[np.ndarray, np.ndarray]
+        The time grid and the simulated price paths.
+        The paths array has shape (n_paths, n_steps + 1).
     """
 
     if sigma < 0:
@@ -103,16 +87,14 @@ def simulate_bachelier_paths(
     dt = maturity / n_steps
     t_grid = np.linspace(0.0, maturity, n_steps + 1)
 
-    # Independent Gaussian increments:
-    # dP_t = sigma * sqrt(dt) * Z, where Z ~ N(0, 1).
-    increments = rng.normal(
-        loc=0.0,
-        scale=sigma * np.sqrt(dt),
-        size=(n_paths, n_steps),
-    )
+    # Under the Bachelier model, price increments are Gaussian:
+    #
+    #     Delta P = sigma sqrt(dt) Z
+    #
+    # where Z is standard normal.
+    increments = sigma * np.sqrt(dt) * rng.standard_normal(size=(n_paths, n_steps))
 
-    # Build the price paths by cumulatively summing the increments.
-    paths = np.zeros((n_paths, n_steps + 1))
+    paths = np.empty((n_paths, n_steps + 1))
     paths[:, 0] = p0
     paths[:, 1:] = p0 + np.cumsum(increments, axis=1)
 
@@ -121,17 +103,12 @@ def simulate_bachelier_paths(
 
 def analyze_bachelier_paths(t_grid, paths, p0=P0, sigma=SIGMA):
     """
-    Compute the main empirical quantities of the simulation.
-
-    This function checks the numerical behaviour of:
-
-        E[P_t] ≈ P_0
-        Var[P_t] ≈ sigma^2 t
+    Compute empirical and theoretical quantities for Bachelier paths.
 
     Parameters
     ----------
     t_grid : np.ndarray
-        Time grid.
+        Time grid returned by the simulation.
     paths : np.ndarray
         Simulated price paths.
     p0 : float
@@ -141,19 +118,20 @@ def analyze_bachelier_paths(t_grid, paths, p0=P0, sigma=SIGMA):
 
     Returns
     -------
-    mean_path : np.ndarray
-        Empirical mean of the simulated process.
-    empirical_variance : np.ndarray
-        Empirical variance of the simulated process.
-    theoretical_variance : np.ndarray
-        Theoretical variance sigma^2 t.
+    tuple[np.ndarray, np.ndarray, np.ndarray]
+        Empirical mean path, empirical variance path, and theoretical variance.
     """
 
-    mean_path = paths.mean(axis=0)
-    empirical_variance = paths.var(axis=0)
+    mean_path = np.mean(paths, axis=0)
+    empirical_variance = np.var(paths, axis=0, ddof=0)
     theoretical_variance = sigma**2 * t_grid
 
     return mean_path, empirical_variance, theoretical_variance
+
+
+# -----------------------------------------------------------------------------
+# Figure generation
+# -----------------------------------------------------------------------------
 
 
 def save_figure(
@@ -167,158 +145,98 @@ def save_figure(
     output_path="figures/fig1_random_walk_martingale.png",
 ):
     """
-    Save the main figure of the simulation.
-
-    The figure contains:
-
-    1. Simulated Bachelier price paths.
-    2. A comparison between empirical variance and theoretical variance.
+    Save the Brownian motion figure used in the repository and paper.
     """
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
+    standard_deviation = sigma * np.sqrt(t_grid)
 
-    # -------------------------------------------------------------------------
-    # Panel 1: simulated price paths
-    # -------------------------------------------------------------------------
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
-    ax = axes[0]
+    # Left panel: sample paths and martingale check.
+    for path in paths[:25]:
+        axes[0].plot(t_grid, path, linewidth=0.8, alpha=0.35)
 
-    for i in range(min(60, paths.shape[0])):
-        ax.plot(t_grid, paths[i], lw=0.6, alpha=0.5)
-
-    ax.plot(
+    axes[0].plot(t_grid, mean_path, linewidth=2.5, label="Empirical mean")
+    axes[0].plot(
         t_grid,
-        mean_path,
-        color="black",
-        lw=2,
-        label=r"Empirical $E[P_t]$",
+        p0 + standard_deviation,
+        linestyle="--",
+        linewidth=1.5,
+        label="P0 +/- one std. dev.",
     )
+    axes[0].plot(t_grid, p0 - standard_deviation, linestyle="--", linewidth=1.5)
 
-    ax.axhline(
-        p0,
-        color="red",
-        ls="--",
-        lw=1,
-        label=r"$P_0$",
-    )
+    axes[0].set_title("Bachelier price paths")
+    axes[0].set_xlabel("Time")
+    axes[0].set_ylabel("Price")
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
 
-    ax.plot(
-        t_grid,
-        p0 + sigma * np.sqrt(t_grid),
-        color="blue",
-        ls=":",
-        lw=1.5,
-        label=r"$P_0 \pm \sigma\sqrt{t}$",
-    )
-
-    ax.plot(
-        t_grid,
-        p0 - sigma * np.sqrt(t_grid),
-        color="blue",
-        ls=":",
-        lw=1.5,
-    )
-
-    ax.set_xlabel("Time")
-    ax.set_ylabel(r"$P_t$")
-    ax.set_title(
-        "Arithmetic Brownian Motion — Bachelier (1900)\n"
-        "Simulated Price Paths"
-    )
-    ax.legend(fontsize=8)
-
-    # -------------------------------------------------------------------------
-    # Panel 2: empirical variance versus theoretical variance
-    # -------------------------------------------------------------------------
-
-    ax = axes[1]
-
-    ax.plot(
-        t_grid,
-        empirical_variance,
-        lw=2,
-        label="Empirical variance",
-    )
-
-    ax.plot(
+    # Right panel: variance scaling.
+    axes[1].plot(t_grid, empirical_variance, linewidth=2.0, label="Empirical variance")
+    axes[1].plot(
         t_grid,
         theoretical_variance,
-        "--",
-        lw=2,
-        label=r"Theoretical variance $\sigma^2 t$",
+        linestyle="--",
+        linewidth=2.0,
+        label="Theoretical variance",
     )
 
-    ax.set_xlabel("Time")
-    ax.set_ylabel(r"$\mathrm{Var}[P_t]$")
-    ax.set_title(
-        "Linear Growth of Variance\n"
-        r"Standard Deviation Scales as $\sqrt{t}$"
-    )
-    ax.legend(fontsize=8)
+    axes[1].set_title("Variance scaling")
+    axes[1].set_xlabel("Time")
+    axes[1].set_ylabel("Variance")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
 
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=160)
-    plt.close()
+    fig.suptitle("Bachelier arithmetic Brownian motion", fontsize=14)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.close(fig)
 
     return output_path
 
 
-# =============================================================================
-# Main experiment
-# =============================================================================
+# -----------------------------------------------------------------------------
+# Main script
+# -----------------------------------------------------------------------------
+
 
 def main():
     """
-    Run the full numerical experiment.
+    Run the full Brownian motion experiment.
     """
 
     t_grid, paths = simulate_bachelier_paths()
-
     mean_path, empirical_variance, theoretical_variance = analyze_bachelier_paths(
-        t_grid=t_grid,
-        paths=paths,
+        t_grid,
+        paths,
     )
 
+    terminal_mean = mean_path[-1]
+    terminal_variance = empirical_variance[-1]
+    theoretical_terminal_variance = theoretical_variance[-1]
     max_mean_deviation = np.max(np.abs(mean_path - P0))
 
-    relative_final_variance_error = (
-        abs(empirical_variance[-1] - theoretical_variance[-1])
-        / theoretical_variance[-1]
-    )
-
-    empirical_final_std = np.std(paths[:, -1])
-    theoretical_final_std = SIGMA * np.sqrt(MATURITY)
-
-    negative_price_probability = np.mean(paths[:, -1] < 0)
-
-    print("=== Bachelier (1900) Arithmetic Brownian Motion ===")
+    print("Bachelier arithmetic Brownian motion")
+    print("-------------------------------------")
+    print(f"Initial price: {P0:.4f}")
+    print(f"Arithmetic volatility: {SIGMA:.4f}")
+    print(f"Maturity: {MATURITY:.4f}")
+    print(f"Number of simulated paths: {N_PATHS:,}")
+    print(f"Number of time steps: {N_STEPS:,}")
     print()
-    print("Martingale property:")
-    print(f"Maximum deviation between empirical E[P_t] and P0: {max_mean_deviation:.4f}")
+    print("Martingale check")
+    print(f"Terminal empirical mean: {terminal_mean:.6f}")
+    print(f"Maximum mean deviation from P0: {max_mean_deviation:.6f}")
     print()
-    print("Variance growth:")
-    print(f"Theoretical variance at maturity: {theoretical_variance[-1]:.4f}")
-    print(f"Empirical variance at maturity: {empirical_variance[-1]:.4f}")
-    print(f"Relative error: {relative_final_variance_error * 100:.2f}%")
-    print()
-    print("Final standard deviation:")
-    print(f"Theoretical standard deviation: {theoretical_final_std:.4f}")
-    print(f"Empirical standard deviation: {empirical_final_std:.4f}")
-    print()
-    print("Structural limitation of the arithmetic model:")
-    print(
-        "Proportion of terminal prices below zero: "
-        f"{negative_price_probability * 100:.3f}%"
-    )
-    print(
-        "This limitation was later addressed by positive-price models, "
-        "especially geometric Brownian motion."
-    )
+    print("Variance check")
+    print(f"Terminal empirical variance: {terminal_variance:.6f}")
+    print(f"Theoretical terminal variance: {theoretical_terminal_variance:.6f}")
 
-    figure_path = save_figure(
+    output_path = save_figure(
         t_grid=t_grid,
         paths=paths,
         mean_path=mean_path,
@@ -327,7 +245,7 @@ def main():
     )
 
     print()
-    print(f"Figure saved to: {figure_path}")
+    print(f"Figure saved to: {output_path}")
 
 
 if __name__ == "__main__":
