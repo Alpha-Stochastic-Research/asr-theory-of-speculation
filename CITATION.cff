@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+message: "If you use this repository in your research, teaching, or open-source work, please cite it as below."
+
+title: "Bachelier (1900): Theory of Speculation — Reproducible Implementation"
+type: software
+
+authors:
+  - family-names: "TOURE"
+    given-names: "Alpha Kabinet"
+    affiliation: "Founder and CEO, Alpha Stochastic Research"
+    email: "research@asr-lab.online"
+
+  - name: "Alpha Stochastic Research"
+    affiliation: "Independent Quantitative Finance Research Laboratory"
+    email: "research@asr-lab.online"
+
+abstract: >
+  This repository provides a reproducible implementation of Louis Bachelier's
+  1900 doctoral thesis, Théorie de la Spéculation. It includes mathematical
+  derivations, Python simulations, numerical validation, publication-quality
+  figures, and educational material for quantitative finance research.
+
+keywords:
+  - quantitative finance
+  - financial mathematics
+  - stochastic processes
+  - Brownian motion
+  - Bachelier model
+  - option pricing
+  - Monte Carlo simulation
+  - numerical methods
+  - reproducible research
+  - open science
+
+license: MIT
+
+repository-code: "https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation"
+url: "https://asr-lab.online"
+
+preferred-citation:
+  type: software
+  title: "Bachelier (1900): Theory of Speculation — Reproducible Implementation"
+  authors:
+    - family-names: "TOURE"
+      given-names: "Alpha Kabinet"
+      affiliation: "Founder and CEO, Alpha Stochastic Research"
+      email: "research@asr-lab.online"
+
+    - name: "Alpha Stochastic Research"
+      affiliation: "Independent Quantitative Finance Research Laboratory"
+      email: "research@asr-lab.online"
+
+  year: 2026
+  url: "https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation"
