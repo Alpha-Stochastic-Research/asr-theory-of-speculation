@@ -55,8 +55,8 @@ bachelier-1900-reproduction/
 │   └── fig2_option_pricing.png
 │
 ├── paper/
-│   ├── bachelier_paper_corrige.tex
-│   └── bachelier_paper_corrige.pdf
+│   ├── bachelier_paper.tex
+│   └── bachelier_paper.pdf
 │
 └── assets/
     └── logo/
