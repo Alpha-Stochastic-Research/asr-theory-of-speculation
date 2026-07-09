@@ -61,7 +61,7 @@ bachelier-1900-reproduction/
 │   └── bachelier_paper.pdf
 │
 └── assets/
-    └── logo/
+    └── logo.png
 ```
 
 ---
