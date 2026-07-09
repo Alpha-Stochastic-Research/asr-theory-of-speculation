@@ -4,7 +4,7 @@
 
 # Bachelier (1900): Theory of Speculation
 
-### Reproducible Implementation of Louis Bachelier’s Foundational Model in Quantitative Finance
+### Reproducible Reconstruction of the Origins of Quantitative Finance
 
 **Alpha Stochastic Research**  
 *Independent Quantitative Finance Research Laboratory*
@@ -20,6 +20,7 @@
 
 <br>
 
+
 [![Website](https://img.shields.io/badge/Website-asr--lab.online-0A2540?style=for-the-badge)](https://asr-lab.online)
 [![Research](https://img.shields.io/badge/Research-research@asr--lab.online-0A2540?style=for-the-badge)](mailto:research@asr-lab.online)
 
@@ -29,24 +30,25 @@
 
 ## Overview
 
-This repository provides a reproducible implementation of Louis Bachelier’s 1900 doctoral thesis:
+This repository provides a modern, reproducible reconstruction of Louis Bachelier's 1900 doctoral thesis:
 
 > **Théorie de la Spéculation**
 
-Bachelier’s work is one of the earliest mathematical foundations of modern quantitative finance. It introduced a probabilistic framework for modelling price fluctuations using what is now recognized as arithmetic Brownian motion.
+Bachelier's work is one of the earliest mathematical foundations of modern quantitative finance. It introduced a probabilistic framework for modelling price fluctuations using what is now recognized as arithmetic Brownian motion.
 
-This project reproduces and explains key ideas from Bachelier’s work using modern Python-based scientific computing.
+This project reproduces and explains the core mathematical ideas using modern Python-based scientific computing.
 
 The repository includes:
 
 - arithmetic Brownian motion simulations;
 - numerical verification of the martingale property;
 - variance scaling analysis;
-- Bachelier’s European call option pricing formula;
+- Bachelier's European call option pricing formula;
 - Monte Carlo validation;
 - comparison with Black-Scholes under low relative volatility;
 - reproducible figures;
-- tests;
+- automated tests;
+- LaTeX working paper source;
 - citation metadata;
 - open-source documentation.
 
@@ -61,8 +63,8 @@ This repository aims to:
 - preserve one of the foundational works of quantitative finance;
 - provide readable Python implementations;
 - make the numerical results reproducible;
-- explain the mathematical structure behind Bachelier’s model;
-- support students, researchers and practitioners interested in financial mathematics.
+- explain the mathematical structure behind Bachelier's model;
+- support students, researchers, and practitioners interested in financial mathematics.
 
 ---
 
@@ -93,7 +95,7 @@ and
 \mathrm{Var}(P_t) = \sigma^2 t
 ```
 
-The model is simple, elegant and historically important. It also has a structural limitation: because prices are normally distributed, negative prices are theoretically possible.
+The model is simple, elegant, and historically important. It also has a structural limitation: because prices are normally distributed, negative prices are theoretically possible.
 
 ---
 
@@ -145,26 +147,22 @@ asr-theory-of-speculation
 ├── .github/
 │   └── workflows/
 │       └── python-ci.yml
-│
 ├── assets/
 │   └── logo.png
-│
 ├── figures/
 │   ├── fig1_random_walk_martingale.png
 │   └── fig2_option_pricing.png
-│
 ├── paper/
-│   └── bachelier_paper.pdf
-│
+│   ├── main.tex
+│   ├── references.bib
+│   └── README.md
 ├── src/
 │   ├── brownian_motion.py
 │   └── option_pricing.py
-│
 ├── tests/
 │   ├── conftest.py
 │   ├── test_brownian_motion.py
 │   └── test_option_pricing.py
-│
 ├── AUTHORS.md
 ├── CHANGELOG.md
 ├── CITATION.cff
@@ -181,10 +179,10 @@ asr-theory-of-speculation
 | File or Folder | Purpose |
 |---|---|
 | `src/brownian_motion.py` | Simulates Bachelier arithmetic Brownian motion and verifies martingale and variance properties |
-| `src/option_pricing.py` | Implements Bachelier option pricing, Monte Carlo validation and comparison with Black-Scholes |
+| `src/option_pricing.py` | Implements Bachelier option pricing, Monte Carlo validation, and comparison with Black-Scholes |
 | `tests/` | Contains automated tests for simulations and pricing formulas |
 | `figures/` | Stores generated figures |
-| `paper/` | Stores manuscript or reference material |
+| `paper/` | Contains the LaTeX working paper source |
 | `CITATION.cff` | Provides citation metadata |
 | `REPRODUCIBILITY.md` | Explains how to reproduce the numerical results |
 | `AUTHORS.md` | Lists authorship and institutional information |
@@ -272,6 +270,37 @@ The tests check:
 
 ---
 
+## Working Paper
+
+The LaTeX source of the accompanying working paper is available in:
+
+```text
+paper/main.tex
+```
+
+The paper provides a scientific reconstruction of Bachelier's theory with:
+
+- literature review;
+- historical source and scope of reproduction;
+- mathematical derivations;
+- computational methodology;
+- numerical results;
+- discussion and limitations;
+- reproducibility statement;
+- code and data availability;
+- references and appendices.
+
+To compile the paper from the `paper/` directory:
+
+```bash
+pdflatex main.tex
+bibtex main
+pdflatex main.tex
+pdflatex main.tex
+```
+
+---
+
 ## Continuous Integration
 
 This repository uses GitHub Actions to validate the project automatically.
@@ -348,7 +377,7 @@ https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation
 
 This repository is released under the MIT License.
 
-You are free to use, modify and distribute the code under the terms of the license.
+You are free to use, modify, and distribute the code under the terms of the license.
 
 See:
 
@@ -386,7 +415,7 @@ AUTHORS.md
 
 **Bachelier, L. (1900).**  
 *Théorie de la Spéculation.*  
-Annales Scientifiques de l’École Normale Supérieure, 17, 21–86.
+Annales Scientifiques de l'École Normale Supérieure, 17, 21–86.
 
 **Samuelson, P. A. (1965).**  
 *Rational Theory of Warrant Pricing.*  
@@ -404,7 +433,7 @@ The Bell Journal of Economics and Management Science, 4(1), 141–183.
 
 ## About Alpha Stochastic Research
 
-**Alpha Stochastic Research (ASR)** is an independent quantitative finance research laboratory dedicated to rigorous, transparent and reproducible research.
+**Alpha Stochastic Research (ASR)** is an independent quantitative finance research laboratory dedicated to rigorous, transparent, and reproducible research.
 
 ASR works at the intersection of:
 
