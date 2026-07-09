@@ -31,7 +31,7 @@ This repository provides a **fully reproducible implementation** of Louis Bachel
 
 widely recognized as the **foundation of modern quantitative finance**.
 
-Developed by **Alpha Stochastic Research (ASR)**, this project reproduces the principal mathematical results of Bachelier's work using modern computational methods. It includes numerical simulations, theoretical verification, Python implementations, publication-quality figures, and a corrected LaTeX edition of the original manuscript.
+Developed by **Alpha Stochastic Research (ASR)**, this project reproduces the principal mathematical results of Bachelier's work using modern computational methods. It includes numerical simulations, theoretical verification, Python implementations, publication-quality figures, and a pdf edition of the original manuscript.
 
 The objective is to preserve one of the most influential contributions to financial mathematics while promoting **open science**, **reproducible research**, and **quantitative education**.
 
@@ -58,7 +58,6 @@ bachelier-1900-reproduction/
 │   └── fig2_option_pricing.png
 │
 ├── paper/
-│   ├── bachelier_paper.tex
 │   └── bachelier_paper.pdf
 │
 └── assets/
@@ -75,7 +74,6 @@ bachelier-1900-reproduction/
 - Monte Carlo Validation
 - Numerical Experiments
 - Publication-Quality Figures
-- Corrected LaTeX Manuscript
 - Fully Reproducible Research
 
 ---
@@ -167,8 +165,7 @@ figures/
 
 The repository includes
 
-- Corrected LaTeX source
-- Compiled PDF
+- PDF
 - Improved formatting
 - Reproducible mathematical derivations
 
