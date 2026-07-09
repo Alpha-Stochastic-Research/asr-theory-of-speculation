@@ -1,25 +1,25 @@
 """
-Reproduction du modèle de Bachelier (1900) :
-marche aléatoire arithmétique et mouvement brownien.
+Bachelier (1900) arithmetic Brownian motion simulation.
 
-Dans la Théorie de la Spéculation, Bachelier modélise le prix comme :
+In "Théorie de la Spéculation", Louis Bachelier models price changes using
+an arithmetic Brownian motion:
 
-    P_t = P_0 + sigma * W_t
+    P_t = P_0 + sigma W_t
 
-où :
-    - P_0 est le prix initial,
-    - sigma est la volatilité arithmétique,
-    - W_t est un mouvement brownien standard.
+where:
+    P_0   is the initial price,
+    sigma is the arithmetic volatility,
+    W_t   is a standard Brownian motion.
 
-Ce script vérifie numériquement deux propriétés importantes :
+This script numerically illustrates two core properties:
 
-1. Propriété de martingale :
+1. Martingale property:
        E[P_t] = P_0
 
-2. Croissance linéaire de la variance :
-       Var[P_t] = sigma^2 * t
+2. Linear variance growth:
+       Var[P_t] = sigma^2 t
 
-L'objectif est de garder un code simple, lisible et reproductible.
+The goal is to keep the code simple, readable, educational, and reproducible.
 """
 
 from pathlib import Path
@@ -28,90 +28,90 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# ============================================================================
-# Paramètres principaux de la simulation
-# ============================================================================
+# =============================================================================
+# Main simulation parameters
+# =============================================================================
 
-P0 = 100.0          # Prix initial
-SIGMA = 2.0        # Volatilité arithmétique
-T = 1.0            # Horizon de temps
-N_STEPS = 250      # Nombre de pas de temps
-N_PATHS = 5_000    # Nombre de trajectoires simulées
-SEED = 42          # Graine aléatoire pour reproduire les résultats
+P0 = 100.0
+SIGMA = 2.0
+MATURITY = 1.0
+N_STEPS = 250
+N_PATHS = 5_000
+SEED = 42
 
 
-# ============================================================================
-# Fonctions utiles
-# ============================================================================
+# =============================================================================
+# Simulation functions
+# =============================================================================
 
 def simulate_bachelier_paths(
     p0=P0,
     sigma=SIGMA,
-    T=T,
+    maturity=MATURITY,
     n_steps=N_STEPS,
     n_paths=N_PATHS,
     seed=SEED,
 ):
     """
-    Simule des trajectoires du modèle de Bachelier.
+    Simulate price paths under the Bachelier arithmetic Brownian motion model.
 
-    Le modèle est :
+    The model is:
 
-        P_t = P_0 + sigma * W_t
+        P_t = P_0 + sigma W_t
 
-    Sur un petit intervalle de temps dt, les incréments sont :
+    Over a small time interval dt, price increments satisfy:
 
         dP_t ~ N(0, sigma^2 dt)
 
     Parameters
     ----------
     p0 : float
-        Prix initial.
+        Initial price.
     sigma : float
-        Volatilité arithmétique.
-    T : float
-        Horizon de temps.
+        Arithmetic volatility.
+    maturity : float
+        Time horizon.
     n_steps : int
-        Nombre de pas de discrétisation.
+        Number of time steps.
     n_paths : int
-        Nombre de trajectoires Monte Carlo.
+        Number of simulated Monte Carlo paths.
     seed : int
-        Graine aléatoire pour rendre la simulation reproductible.
+        Random seed used for reproducibility.
 
     Returns
     -------
     t_grid : np.ndarray
-        Grille temporelle.
+        Time grid.
     paths : np.ndarray
-        Matrice des trajectoires simulées.
+        Simulated price paths with shape (n_paths, n_steps + 1).
     """
 
     if sigma < 0:
-        raise ValueError("sigma doit être positif ou nul.")
+        raise ValueError("sigma must be non-negative.")
 
-    if T <= 0:
-        raise ValueError("T doit être strictement positif.")
+    if maturity <= 0:
+        raise ValueError("maturity must be strictly positive.")
 
     if n_steps <= 0:
-        raise ValueError("n_steps doit être strictement positif.")
+        raise ValueError("n_steps must be strictly positive.")
 
     if n_paths <= 0:
-        raise ValueError("n_paths doit être strictement positif.")
+        raise ValueError("n_paths must be strictly positive.")
 
     rng = np.random.default_rng(seed)
 
-    dt = T / n_steps
-    t_grid = np.linspace(0, T, n_steps + 1)
+    dt = maturity / n_steps
+    t_grid = np.linspace(0.0, maturity, n_steps + 1)
 
-    # Incréments gaussiens indépendants :
-    # dP_t = sigma * sqrt(dt) * Z, avec Z ~ N(0,1)
+    # Independent Gaussian increments:
+    # dP_t = sigma * sqrt(dt) * Z, where Z ~ N(0, 1).
     increments = rng.normal(
         loc=0.0,
         scale=sigma * np.sqrt(dt),
         size=(n_paths, n_steps),
     )
 
-    # On construit les trajectoires en cumulant les incréments.
+    # Build the price paths by cumulatively summing the increments.
     paths = np.zeros((n_paths, n_steps + 1))
     paths[:, 0] = p0
     paths[:, 1:] = p0 + np.cumsum(increments, axis=1)
@@ -119,11 +119,11 @@ def simulate_bachelier_paths(
     return t_grid, paths
 
 
-def analyse_bachelier_paths(t_grid, paths, p0=P0, sigma=SIGMA):
+def analyze_bachelier_paths(t_grid, paths, p0=P0, sigma=SIGMA):
     """
-    Calcule les grandeurs empiriques principales.
+    Compute the main empirical quantities of the simulation.
 
-    On vérifie :
+    This function checks the numerical behaviour of:
 
         E[P_t] ≈ P_0
         Var[P_t] ≈ sigma^2 t
@@ -131,48 +131,48 @@ def analyse_bachelier_paths(t_grid, paths, p0=P0, sigma=SIGMA):
     Parameters
     ----------
     t_grid : np.ndarray
-        Grille temporelle.
+        Time grid.
     paths : np.ndarray
-        Trajectoires simulées.
+        Simulated price paths.
     p0 : float
-        Prix initial.
+        Initial price.
     sigma : float
-        Volatilité arithmétique.
+        Arithmetic volatility.
 
     Returns
     -------
     mean_path : np.ndarray
-        Espérance empirique de P_t.
-    empirical_var : np.ndarray
-        Variance empirique de P_t.
-    theoretical_var : np.ndarray
-        Variance théorique sigma^2 t.
+        Empirical mean of the simulated process.
+    empirical_variance : np.ndarray
+        Empirical variance of the simulated process.
+    theoretical_variance : np.ndarray
+        Theoretical variance sigma^2 t.
     """
 
     mean_path = paths.mean(axis=0)
-    empirical_var = paths.var(axis=0)
-    theoretical_var = sigma**2 * t_grid
+    empirical_variance = paths.var(axis=0)
+    theoretical_variance = sigma**2 * t_grid
 
-    return mean_path, empirical_var, theoretical_var
+    return mean_path, empirical_variance, theoretical_variance
 
 
 def save_figure(
     t_grid,
     paths,
     mean_path,
-    empirical_var,
-    theoretical_var,
+    empirical_variance,
+    theoretical_variance,
     p0=P0,
     sigma=SIGMA,
     output_path="figures/fig1_random_walk_martingale.png",
 ):
     """
-    Sauvegarde la figure principale du script.
+    Save the main figure of the simulation.
 
-    La figure contient :
+    The figure contains:
 
-    1. Des trajectoires simulées du modèle de Bachelier.
-    2. La comparaison entre variance empirique et variance théorique.
+    1. Simulated Bachelier price paths.
+    2. A comparison between empirical variance and theoretical variance.
     """
 
     output_path = Path(output_path)
@@ -180,13 +180,13 @@ def save_figure(
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.5))
 
-    # ------------------------------------------------------------------------
-    # Graphique 1 : trajectoires simulées
-    # ------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Panel 1: simulated price paths
+    # -------------------------------------------------------------------------
 
     ax = axes[0]
 
-    for i in range(60):
+    for i in range(min(60, paths.shape[0])):
         ax.plot(t_grid, paths[i], lw=0.6, alpha=0.5)
 
     ax.plot(
@@ -194,7 +194,7 @@ def save_figure(
         mean_path,
         color="black",
         lw=2,
-        label=r"$E[P_t]$ empirique",
+        label=r"Empirical $E[P_t]$",
     )
 
     ax.axhline(
@@ -222,40 +222,40 @@ def save_figure(
         lw=1.5,
     )
 
-    ax.set_xlabel("t")
+    ax.set_xlabel("Time")
     ax.set_ylabel(r"$P_t$")
     ax.set_title(
-        "Marche aléatoire arithmétique — Bachelier (1900)\n"
-        "60 trajectoires simulées"
+        "Arithmetic Brownian Motion — Bachelier (1900)\n"
+        "Simulated Price Paths"
     )
     ax.legend(fontsize=8)
 
-    # ------------------------------------------------------------------------
-    # Graphique 2 : variance empirique vs variance théorique
-    # ------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
+    # Panel 2: empirical variance versus theoretical variance
+    # -------------------------------------------------------------------------
 
     ax = axes[1]
 
     ax.plot(
         t_grid,
-        empirical_var,
+        empirical_variance,
         lw=2,
-        label="Variance empirique",
+        label="Empirical variance",
     )
 
     ax.plot(
         t_grid,
-        theoretical_var,
+        theoretical_variance,
         "--",
         lw=2,
-        label=r"Variance théorique $\sigma^2 t$",
+        label=r"Theoretical variance $\sigma^2 t$",
     )
 
-    ax.set_xlabel("t")
-    ax.set_ylabel(r"Var$[P_t]$")
+    ax.set_xlabel("Time")
+    ax.set_ylabel(r"$\mathrm{Var}[P_t]$")
     ax.set_title(
-        "Croissance linéaire de la variance\n"
-        r"et écart-type en $\sqrt{t}$"
+        "Linear Growth of Variance\n"
+        r"Standard Deviation Scales as $\sqrt{t}$"
     )
     ax.legend(fontsize=8)
 
@@ -266,68 +266,68 @@ def save_figure(
     return output_path
 
 
-# ============================================================================
-# Exécution principale
-# ============================================================================
+# =============================================================================
+# Main experiment
+# =============================================================================
 
 def main():
     """
-    Lance l'expérience numérique complète.
+    Run the full numerical experiment.
     """
 
     t_grid, paths = simulate_bachelier_paths()
 
-    mean_path, empirical_var, theoretical_var = analyse_bachelier_paths(
+    mean_path, empirical_variance, theoretical_variance = analyze_bachelier_paths(
         t_grid=t_grid,
         paths=paths,
     )
 
-    max_dev = np.max(np.abs(mean_path - P0))
+    max_mean_deviation = np.max(np.abs(mean_path - P0))
 
-    rel_error_var_final = (
-        abs(empirical_var[-1] - theoretical_var[-1])
-        / theoretical_var[-1]
+    relative_final_variance_error = (
+        abs(empirical_variance[-1] - theoretical_variance[-1])
+        / theoretical_variance[-1]
     )
 
-    empirical_std_final = np.std(paths[:, -1])
-    theoretical_std_final = SIGMA * np.sqrt(T)
+    empirical_final_std = np.std(paths[:, -1])
+    theoretical_final_std = SIGMA * np.sqrt(MATURITY)
 
     negative_price_probability = np.mean(paths[:, -1] < 0)
 
-    print("=== Vérification du modèle de Bachelier (1900) ===")
+    print("=== Bachelier (1900) Arithmetic Brownian Motion ===")
     print()
-    print("Propriété de martingale :")
-    print(f"Écart max entre E[P_t] simulé et P0 : {max_dev:.4f}")
+    print("Martingale property:")
+    print(f"Maximum deviation between empirical E[P_t] and P0: {max_mean_deviation:.4f}")
     print()
-    print("Croissance de la variance :")
-    print(f"Variance théorique à T : {theoretical_var[-1]:.4f}")
-    print(f"Variance empirique à T : {empirical_var[-1]:.4f}")
-    print(f"Erreur relative : {rel_error_var_final * 100:.2f} %")
+    print("Variance growth:")
+    print(f"Theoretical variance at maturity: {theoretical_variance[-1]:.4f}")
+    print(f"Empirical variance at maturity: {empirical_variance[-1]:.4f}")
+    print(f"Relative error: {relative_final_variance_error * 100:.2f}%")
     print()
-    print("Écart-type final :")
-    print(f"Écart-type théorique : {theoretical_std_final:.4f}")
-    print(f"Écart-type empirique : {empirical_std_final:.4f}")
+    print("Final standard deviation:")
+    print(f"Theoretical standard deviation: {theoretical_final_std:.4f}")
+    print(f"Empirical standard deviation: {empirical_final_std:.4f}")
     print()
-    print("Limite structurelle du modèle arithmétique :")
+    print("Structural limitation of the arithmetic model:")
     print(
-        "Proportion de trajectoires finissant à un prix négatif : "
-        f"{negative_price_probability * 100:.3f} %"
+        "Proportion of terminal prices below zero: "
+        f"{negative_price_probability * 100:.3f}%"
     )
     print(
-        "Cette limite sera plus tard corrigée par les modèles à prix positifs, "
-        "notamment le mouvement brownien géométrique."
+        "This limitation was later addressed by positive-price models, "
+        "especially geometric Brownian motion."
     )
 
     figure_path = save_figure(
         t_grid=t_grid,
         paths=paths,
         mean_path=mean_path,
-        empirical_var=empirical_var,
-        theoretical_var=theoretical_var,
+        empirical_variance=empirical_variance,
+        theoretical_variance=theoretical_variance,
     )
 
     print()
-    print(f"Figure enregistrée : {figure_path}")
+    print(f"Figure saved to: {figure_path}")
 
 
 if __name__ == "__main__":
