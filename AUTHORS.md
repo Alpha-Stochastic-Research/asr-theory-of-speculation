@@ -3,7 +3,7 @@
 ## Primary Author
 
 **Alpha Kabinet TOURE**  
-Founder and CEO, Alpha Stochastic Research  
+Founder and Researcher, Alpha Stochastic Research  
 
 Research contact: research@asr-lab.online
 
