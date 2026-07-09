@@ -1,57 +1,154 @@
 <div align="center">
 
-<img src="assets/logo.png" width="180">
+<img src="assets/logo.png" alt="Alpha Stochastic Research Logo" width="130">
 
-# Bachelier (1900): *Theory of Speculation*
+# Bachelier (1900): Theory of Speculation
 
-### Reproducible Research Project
+### Reproducible Implementation of Louis Bachelier’s Foundational Model in Quantitative Finance
 
-**Alpha Stochastic Research (ASR)**  
+**Alpha Stochastic Research**  
 *Independent Quantitative Finance Research Laboratory*
 
-[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org/)
-[![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=flat-square&logo=scipy&logoColor=white)](https://scipy.org/)
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=flat-square)](https://matplotlib.org/)
-[![LaTeX](https://img.shields.io/badge/LaTeX-008080?style=flat-square&logo=latex&logoColor=white)](https://www.latex-project.org/)
-[![License](https://img.shields.io/badge/License-MIT-success?style=flat-square)](LICENSE)
+<br>
 
-[![Website](https://img.shields.io/badge/Website-asr--lab.online-00C3FF?style=flat-square)](https://asr-lab.online)
-[![Research](https://img.shields.io/badge/Research-research@asr--lab.online-0A2540?style=flat-square&logo=gmail&logoColor=white)](mailto:research@asr-lab.online)
+[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![NumPy](https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)
+[![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white)](https://scipy.org/)
+[![Matplotlib](https://img.shields.io/badge/Matplotlib-11557C?style=for-the-badge)](https://matplotlib.org/)
+[![Pytest](https://img.shields.io/badge/Pytest-Tested-0A2540?style=for-the-badge)](https://docs.pytest.org/)
+[![License](https://img.shields.io/badge/License-MIT-16A34A?style=for-the-badge)](LICENSE)
+
+<br>
+
+
+[![Website](https://img.shields.io/badge/Website-asr--lab.online-0A2540?style=for-the-badge)](https://asr-lab.online)
+[![Research](https://img.shields.io/badge/Research-research@asr--lab.online-0A2540?style=for-the-badge)](mailto:research@asr-lab.online)
 
 </div>
 
 ---
 
-# Overview
+## Overview
 
-This repository provides a **fully reproducible implementation** of Louis Bachelier's seminal 1900 doctoral thesis,
+This repository provides a reproducible implementation of Louis Bachelier’s 1900 doctoral thesis:
 
 > **Théorie de la Spéculation**
 
-widely recognized as the **foundation of modern quantitative finance**.
+Bachelier’s work is one of the earliest mathematical foundations of modern quantitative finance. It introduced a probabilistic framework for modelling price fluctuations using what is now recognized as arithmetic Brownian motion.
 
-Developed by **Alpha Stochastic Research (ASR)**, this project reproduces the principal mathematical results of Bachelier's work using modern computational methods. It includes numerical simulations, theoretical verification, Python implementations, publication-quality figures, and a pdf edition of the original manuscript.
+This project reproduces and explains key ideas from Bachelier’s work using modern Python-based scientific computing.
 
-The objective is to preserve one of the most influential contributions to financial mathematics while promoting **open science**, **reproducible research**, and **quantitative education**.
+The repository includes:
+
+- arithmetic Brownian motion simulations;
+- numerical verification of the martingale property;
+- variance scaling analysis;
+- Bachelier’s European call option pricing formula;
+- Monte Carlo validation;
+- comparison with Black-Scholes under low relative volatility;
+- reproducible figures;
+- tests;
+- citation metadata;
+- open-source documentation.
 
 ---
 
-# Repository Structure
+## Research Objective
+
+The objective of this project is to connect historical financial mathematics with modern reproducible research.
+
+This repository aims to:
+
+- preserve one of the foundational works of quantitative finance;
+- provide readable Python implementations;
+- make the numerical results reproducible;
+- explain the mathematical structure behind Bachelier’s model;
+- support students, researchers and practitioners interested in financial mathematics.
+
+---
+
+## Mathematical Framework
+
+Bachelier models the price process as an arithmetic Brownian motion:
+
+```math
+P_t = P_0 + \sigma W_t
+```
+
+where:
+
+- `P_t` is the price at time `t`;
+- `P_0` is the initial price;
+- `σ` is the arithmetic volatility;
+- `W_t` is a standard Brownian motion.
+
+This implies:
+
+```math
+\mathbb{E}[P_t] = P_0
+```
+
+and
+
+```math
+\mathrm{Var}(P_t) = \sigma^2 t
+```
+
+The model is simple, elegant and historically important. It also has a structural limitation: because prices are normally distributed, negative prices are theoretically possible.
+
+---
+
+## Option Pricing
+
+Under the Bachelier model, the terminal price is:
+
+```math
+P_T = P_0 + \sigma \sqrt{T} Z
+```
+
+where:
+
+```math
+Z \sim \mathcal{N}(0,1)
+```
+
+For a European call option with strike `K`, the Bachelier price is:
+
+```math
+C = (P_0 - K)\Phi(d) + \sigma\sqrt{T}\phi(d)
+```
+
+with:
+
+```math
+d = \frac{P_0 - K}{\sigma\sqrt{T}}
+```
+
+where:
+
+- `Φ` is the standard normal cumulative distribution function;
+- `φ` is the standard normal probability density function.
+
+For an at-the-money call, where `K = P_0`, the formula simplifies to:
+
+```math
+C_{ATM} = \sigma\sqrt{T}\phi(0)
+```
+
+This illustrates the square-root-of-time scaling of option values in the Bachelier framework.
+
+---
+
+## Repository Structure
 
 ```text
-bachelier-1900-reproduction/
-│
-├── README.md
-├── LICENSE
-├── requirements.txt
-│
-├── src/
-│   ├── brownian_motion.py
-│   └── option_pricing.py
+asr-theory-of-speculation
 ├── .github/
-│   ├── workflows/
-│       ├── python-app.yml
+│   └── workflows/
+│       └── python-ci.yml
+│
+├── assets/
+│   └── logo.png
 │
 ├── figures/
 │   ├── fig1_random_walk_martingale.png
@@ -60,100 +157,94 @@ bachelier-1900-reproduction/
 ├── paper/
 │   └── bachelier_paper.pdf
 │
-└── assets/
-    └── logo.png
+├── src/
+│   ├── brownian_motion.py
+│   └── option_pricing.py
+│
+├── tests/
+│   ├── conftest.py
+│   ├── test_brownian_motion.py
+│   └── test_option_pricing.py
+│
+├── AUTHORS.md
+├── CHANGELOG.md
+├── CITATION.cff
+├── LICENSE
+├── README.md
+├── REPRODUCIBILITY.md
+└── requirements.txt
 ```
 
 ---
 
-# Main Features
+## Main Components
 
-- Reproduction of Bachelier's Arithmetic Brownian Motion
-- Verification of the Martingale Property
-- Closed-Form European Option Pricing
-- Monte Carlo Validation
-- Numerical Experiments
-- Publication-Quality Figures
-- Fully Reproducible Research
-
----
-
-# Numerical Results
-
-## Arithmetic Brownian Motion
-
-The repository reproduces Bachelier's arithmetic stochastic process
-
-```math
-P_t = P_0 + \sigma W_t
-```
-
-using **5,000 Monte Carlo trajectories**.
-
-### Validation
-
-| Property | Result |
-|-----------|--------|
-| Martingale Property | Verified |
-| Maximum Mean Error | **0.037** |
-| Variance Scaling Error | **1.56 %** |
-| Negative Prices | Theoretically possible (not observed in simulation) |
+| File or Folder | Purpose |
+|---|---|
+| `src/brownian_motion.py` | Simulates Bachelier arithmetic Brownian motion and verifies martingale and variance properties |
+| `src/option_pricing.py` | Implements Bachelier option pricing, Monte Carlo validation and comparison with Black-Scholes |
+| `tests/` | Contains automated tests for simulations and pricing formulas |
+| `figures/` | Stores generated figures |
+| `paper/` | Stores manuscript or reference material |
+| `CITATION.cff` | Provides citation metadata |
+| `REPRODUCIBILITY.md` | Explains how to reproduce the numerical results |
+| `AUTHORS.md` | Lists authorship and institutional information |
+| `CHANGELOG.md` | Tracks project changes |
+| `LICENSE` | MIT open-source license |
 
 ---
 
-## European Option Pricing
+## Installation
 
-Implementation of Bachelier's closed-form pricing formula
-
-```math
-C=(P_0-K)\Phi(d)+\sigma\sqrt{T}\,\phi(d)
-```
-
-where
-
-```math
-d=\frac{P_0-K}{\sigma\sqrt{T}}
-```
-
-### Validation
-
-| Test | Result |
-|------|--------|
-| Closed-form vs Monte Carlo (2M paths) | Error = **0.0008** |
-| ATM √T Scaling | Exact |
-| Comparison with Black–Scholes | Maximum Difference = **0.0048** |
-
----
-
-# Installation
-
-Clone the repository
+Clone the repository:
 
 ```bash
-git clone [https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git)
-
+git clone https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git
 cd asr-theory-of-speculation
 ```
 
-Install the required packages
+Create a virtual environment:
 
 ```bash
+python -m venv .venv
+```
+
+Activate it on macOS or Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Activate it on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+Install the required dependencies:
+
+```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
 ---
 
-# Usage
+## Usage
 
-Run the numerical experiments
+Run the arithmetic Brownian motion simulation:
 
 ```bash
 python src/brownian_motion.py
+```
 
+Run the option pricing experiment:
+
+```bash
 python src/option_pricing.py
 ```
 
-Generated figures are automatically saved in
+Generated figures are saved in:
 
 ```text
 figures/
@@ -161,80 +252,197 @@ figures/
 
 ---
 
-# Included Paper
+## Running Tests
 
-The repository includes
+Run the full test suite with:
 
-- PDF
-- Improved formatting
-- Reproducible mathematical derivations
+```bash
+pytest -q
+```
 
-located in
+The tests check:
+
+- simulation dimensions;
+- reproducibility under fixed random seeds;
+- martingale behaviour;
+- theoretical variance scaling;
+- Bachelier option pricing formula;
+- Monte Carlo validation;
+- Black-Scholes benchmark behaviour;
+- invalid input handling.
+
+---
+
+## Continuous Integration
+
+This repository uses GitHub Actions to validate the project automatically.
+
+The CI workflow checks that:
+
+- dependencies install correctly;
+- the test suite passes;
+- the Brownian motion script runs successfully;
+- the option pricing script runs successfully;
+- expected figures are generated.
+
+Workflow file:
 
 ```text
-paper/
+.github/workflows/python-ci.yml
 ```
 
 ---
 
-# Objectives
+## Generated Figures
 
-This project aims to
+The project generates two main figures:
 
-- reproduce one of the founding works of quantitative finance;
-- validate the original mathematical results;
-- provide educational Python implementations;
-- promote reproducible computational finance;
-- preserve the historical foundations of stochastic modelling.
-
----
-
-# References
-
-**Louis Bachelier (1900)**
-
-*Théorie de la Spéculation.*
-
-*Annales Scientifiques de l'École Normale Supérieure*, **17**, 21–86.
+| Figure | Description |
+|---|---|
+| `figures/fig1_random_walk_martingale.png` | Simulated Bachelier paths and variance growth |
+| `figures/fig2_option_pricing.png` | Bachelier option pricing and comparison with Black-Scholes |
 
 ---
 
-**Paul A. Samuelson (1965)**
+## Reproducibility
 
-*Rational Theory of Warrant Pricing.*
+This project is designed as a reproducible research repository.
 
-*Industrial Management Review*, **6(2)**, 13–31.
+Reproducibility principles:
+
+- fixed random seeds;
+- explicit dependencies;
+- clear source code;
+- documented numerical experiments;
+- automated tests;
+- generated figures saved from scripts;
+- citation metadata included.
+
+For full details, see:
+
+```text
+REPRODUCIBILITY.md
+```
 
 ---
 
-# About Alpha Stochastic Research
+## Citation
 
-**Alpha Stochastic Research (ASR)** is an independent quantitative finance research laboratory dedicated to advancing rigorous, transparent, and reproducible research at the intersection of
+If you use this repository in your research, teaching, or open-source work, please cite it using the metadata provided in:
 
-- Financial Markets
-- Mathematics
-- Statistics
-- Stochastic Modelling
-- Artificial Intelligence
+```text
+CITATION.cff
+```
 
-Our mission is to bridge academic research and real-world finance through open science, reproducible computational methods, and high-quality educational resources.
+Suggested citation:
+
+```text
+Alpha Kabinet TOURE and Alpha Stochastic Research.
+Bachelier (1900): Theory of Speculation — Reproducible Implementation.
+Alpha Stochastic Research, 2026.
+https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation
+```
+
+---
+
+## Open Source
+
+This repository is released under the MIT License.
+
+You are free to use, modify and distribute the code under the terms of the license.
+
+See:
+
+```text
+LICENSE
+```
+
+---
+
+## Authors
+
+Primary author:
+
+```text
+Alpha Kabinet TOURE
+Founder and CEO, Alpha Stochastic Research
+```
+
+Institution:
+
+```text
+Alpha Stochastic Research
+Independent Quantitative Finance Research Laboratory
+```
+
+For details, see:
+
+```text
+AUTHORS.md
+```
+
+---
+
+## References
+
+**Bachelier, L. (1900).**  
+*Théorie de la Spéculation.*  
+Annales Scientifiques de l’École Normale Supérieure, 17, 21–86.
+
+**Samuelson, P. A. (1965).**  
+*Rational Theory of Warrant Pricing.*  
+Industrial Management Review, 6(2), 13–31.
+
+**Black, F. and Scholes, M. (1973).**  
+*The Pricing of Options and Corporate Liabilities.*  
+Journal of Political Economy, 81(3), 637–654.
+
+**Merton, R. C. (1973).**  
+*Theory of Rational Option Pricing.*  
+The Bell Journal of Economics and Management Science, 4(1), 141–183.
+
+---
+
+## About Alpha Stochastic Research
+
+**Alpha Stochastic Research (ASR)** is an independent quantitative finance research laboratory dedicated to rigorous, transparent and reproducible research.
+
+ASR works at the intersection of:
+
+- quantitative finance;
+- financial mathematics;
+- stochastic modelling;
+- scientific computing;
+- financial machine learning;
+- open science.
+
+Website:
+
+```text
+https://asr-lab.online
+```
+
+GitHub organization:
+
+```text
+https://github.com/Alpha-Stochastic-Research
+```
+
+Research contact:
+
+```text
+research@asr-lab.online
+```
 
 ---
 
 <div align="center">
 
-### Alpha Stochastic Research
+**Alpha Stochastic Research**  
+*Research → Modelling → Analysis → Impact*
 
-**Website**
+<br>
 
-https://asr-lab.online
-
-**Research Contact**
-
-research@asr-lab.online
-
----
-
-© 2026 Alpha Stochastic Research (ASR)
+© 2026 Alpha Stochastic Research
 
 </div>
