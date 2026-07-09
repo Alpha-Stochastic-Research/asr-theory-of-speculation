@@ -1,0 +1,62 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  MPLBACKEND: Agg
+
+jobs:
+  test-and-validate:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run test suite
+        run: |
+          pytest -q
+
+      - name: Run Brownian motion script
+        run: |
+          python src/brownian_motion.py
+
+      - name: Run option pricing script
+        run: |
+          python src/option_pricing.py
+
+      - name: Check generated figures
+        run: |
+          test -f figures/fig1_random_walk_martingale.png
+          test -f figures/fig2_option_pricing.png
+
+      - name: Upload generated figures
+        uses: actions/upload-artifact@v4
+        with:
+          name: bachelier-generated-figures
+          path: figures/*.png
+          retention-days: 30
