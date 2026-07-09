@@ -130,8 +130,7 @@ d=\frac{P_0-K}{\sigma\sqrt{T}}
 Clone the repository
 
 ```bash
-git clone [https://github.com/Alpha-Stochastic-Research/asr-bachelier-1900.git](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git)
-
+git clone https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation.git
 cd asr-theory-of-speculation
 ```
 
