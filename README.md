@@ -20,7 +20,7 @@
 
 <br>
 
-
+[![Python CI](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation/actions/workflows/python-ci.yml/badge.svg)](https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation/actions/workflows/python-ci.yml)
 [![Website](https://img.shields.io/badge/Website-asr--lab.online-0A2540?style=for-the-badge)](https://asr-lab.online)
 [![Research](https://img.shields.io/badge/Research-research@asr--lab.online-0A2540?style=for-the-badge)](mailto:research@asr-lab.online)
 
