@@ -1,174 +1,197 @@
 """
-Tests for the Bachelier arithmetic Brownian motion simulation.
+Tests for the Bachelier arithmetic Brownian motion process.
 """
+
+from __future__ import annotations
 
 import numpy as np
 import pytest
 
-from brownian_motion import (
-    analyze_bachelier_paths,
-    simulate_bachelier_paths,
-)
+from asr.models import bachelier
 
 
-def test_simulated_paths_have_correct_shape():
+def test_simulate_paths_shape() -> None:
     """
-    The simulation should return a time grid and a matrix of paths
-    with the expected dimensions.
+    Simulated paths should have the expected dimensions.
     """
 
-    n_steps = 10
+    n_steps = 20
     n_paths = 100
 
-    t_grid, paths = simulate_bachelier_paths(
-        p0=100.0,
-        sigma=2.0,
+    time_grid, paths = bachelier.simulate_paths(
+        initial_price=100.0,
+        volatility=2.0,
         maturity=1.0,
         n_steps=n_steps,
         n_paths=n_paths,
         seed=42,
     )
 
-    assert t_grid.shape == (n_steps + 1,)
+    assert time_grid.shape == (n_steps + 1,)
     assert paths.shape == (n_paths, n_steps + 1)
 
 
-def test_all_paths_start_at_initial_price():
+def test_simulate_paths_initial_value() -> None:
     """
-    Every simulated path should start at the initial price P0.
+    All simulated paths should start from the initial price.
     """
 
-    p0 = 100.0
-
-    _, paths = simulate_bachelier_paths(
-        p0=p0,
-        sigma=2.0,
+    _, paths = bachelier.simulate_paths(
+        initial_price=123.45,
+        volatility=2.0,
         maturity=1.0,
-        n_steps=20,
-        n_paths=200,
+        n_steps=10,
+        n_paths=50,
         seed=42,
     )
 
-    assert np.allclose(paths[:, 0], p0)
+    assert np.allclose(paths[:, 0], 123.45)
 
 
-def test_simulation_is_reproducible_with_fixed_seed():
+def test_simulate_paths_reproducibility() -> None:
     """
-    Using the same random seed should produce exactly the same paths.
-    """
-
-    _, paths_a = simulate_bachelier_paths(seed=123)
-    _, paths_b = simulate_bachelier_paths(seed=123)
-
-    assert np.allclose(paths_a, paths_b)
-
-
-def test_theoretical_variance_is_sigma_squared_times_time():
-    """
-    Under the Bachelier model:
-
-        Var[P_t] = sigma^2 t
+    Simulations with the same seed should be exactly reproducible.
     """
 
-    sigma = 2.0
+    _, paths_1 = bachelier.simulate_paths(seed=123)
+    _, paths_2 = bachelier.simulate_paths(seed=123)
 
-    t_grid, paths = simulate_bachelier_paths(
-        p0=100.0,
-        sigma=sigma,
+    assert np.array_equal(paths_1, paths_2)
+
+
+def test_analyze_paths_returns_expected_statistics() -> None:
+    """
+    Path analysis should return arrays with correct shapes and finite values.
+    """
+
+    time_grid, paths = bachelier.simulate_paths(
+        initial_price=100.0,
+        volatility=2.0,
         maturity=1.0,
         n_steps=100,
-        n_paths=1_000,
+        n_paths=2_000,
         seed=42,
     )
 
-    _, _, theoretical_variance = analyze_bachelier_paths(
-        t_grid=t_grid,
+    analysis = bachelier.analyze_paths(
+        time_grid=time_grid,
         paths=paths,
-        p0=100.0,
-        sigma=sigma,
+        initial_price=100.0,
+        volatility=2.0,
     )
 
-    expected_variance = sigma**2 * t_grid
+    assert analysis.mean_path.shape == time_grid.shape
+    assert analysis.empirical_variance.shape == time_grid.shape
+    assert analysis.theoretical_variance.shape == time_grid.shape
+    assert np.all(np.isfinite(analysis.mean_path))
+    assert np.all(np.isfinite(analysis.empirical_variance))
+    assert np.allclose(analysis.theoretical_variance, 4.0 * time_grid)
 
-    assert np.allclose(theoretical_variance, expected_variance)
 
-
-def test_empirical_mean_is_close_to_initial_price():
+def test_terminal_mean_is_close_to_initial_price() -> None:
     """
-    With many simulated paths, the empirical mean should remain close to P0.
-
-    This is a numerical check of the martingale property:
-
-        E[P_t] = P0
+    The Bachelier process is a martingale under the simulation measure.
     """
 
-    p0 = 100.0
-
-    t_grid, paths = simulate_bachelier_paths(
-        p0=p0,
-        sigma=2.0,
+    time_grid, paths = bachelier.simulate_paths(
+        initial_price=100.0,
+        volatility=2.0,
         maturity=1.0,
-        n_steps=100,
+        n_steps=250,
         n_paths=20_000,
         seed=42,
     )
 
-    mean_path, _, _ = analyze_bachelier_paths(
-        t_grid=t_grid,
+    analysis = bachelier.analyze_paths(
+        time_grid=time_grid,
         paths=paths,
-        p0=p0,
-        sigma=2.0,
+        initial_price=100.0,
+        volatility=2.0,
     )
 
-    max_deviation = np.max(np.abs(mean_path - p0))
-
-    assert max_deviation < 0.10
+    assert abs(analysis.terminal_mean - 100.0) < 0.10
 
 
-def test_empirical_variance_is_close_to_theoretical_variance_at_maturity():
+def test_terminal_variance_is_close_to_theoretical_variance() -> None:
     """
-    The empirical terminal variance should be close to the theoretical value:
-
-        sigma^2 T
+    Terminal empirical variance should be close to sigma squared times maturity.
     """
 
-    sigma = 2.0
-    maturity = 1.0
-
-    t_grid, paths = simulate_bachelier_paths(
-        p0=100.0,
-        sigma=sigma,
-        maturity=maturity,
-        n_steps=100,
+    time_grid, paths = bachelier.simulate_paths(
+        initial_price=100.0,
+        volatility=2.0,
+        maturity=1.0,
+        n_steps=250,
         n_paths=20_000,
         seed=42,
     )
 
-    _, empirical_variance, theoretical_variance = analyze_bachelier_paths(
-        t_grid=t_grid,
+    analysis = bachelier.analyze_paths(
+        time_grid=time_grid,
         paths=paths,
-        p0=100.0,
-        sigma=sigma,
+        initial_price=100.0,
+        volatility=2.0,
     )
 
-    relative_error = abs(empirical_variance[-1] - theoretical_variance[-1]) / theoretical_variance[-1]
+    assert abs(
+        analysis.terminal_empirical_variance
+        - analysis.terminal_theoretical_variance
+    ) < 0.15
 
-    assert relative_error < 0.05
 
-
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"sigma": -1.0},
-        {"maturity": 0.0},
-        {"n_steps": 0},
-        {"n_paths": 0},
-    ],
-)
-def test_invalid_simulation_inputs_raise_error(kwargs):
+def test_run_brownian_motion_experiment() -> None:
     """
-    Invalid simulation parameters should raise a ValueError.
+    The high-level Brownian motion experiment should run successfully.
+    """
+
+    time_grid, paths, analysis = bachelier.run_brownian_motion_experiment(
+        n_steps=50,
+        n_paths=500,
+        seed=42,
+    )
+
+    assert time_grid.shape == (51,)
+    assert paths.shape == (500, 51)
+    assert analysis.terminal_theoretical_variance == pytest.approx(4.0)
+
+
+def test_invalid_simulation_inputs_raise_errors() -> None:
+    """
+    Invalid simulation inputs should raise ValueError.
     """
 
     with pytest.raises(ValueError):
-        simulate_bachelier_paths(**kwargs)
+        bachelier.simulate_paths(volatility=-1.0)
+
+    with pytest.raises(ValueError):
+        bachelier.simulate_paths(maturity=0.0)
+
+    with pytest.raises(ValueError):
+        bachelier.simulate_paths(n_steps=0)
+
+    with pytest.raises(ValueError):
+        bachelier.simulate_paths(n_paths=0)
+
+
+def test_invalid_analysis_inputs_raise_errors() -> None:
+    """
+    Invalid analysis inputs should raise ValueError.
+    """
+
+    time_grid = np.linspace(0.0, 1.0, 11)
+    paths = np.zeros((10, 10))
+
+    with pytest.raises(ValueError):
+        bachelier.analyze_paths(time_grid=time_grid, paths=paths)
+
+    with pytest.raises(ValueError):
+        bachelier.analyze_paths(
+            time_grid=np.zeros((2, 2)),
+            paths=np.zeros((10, 4)),
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.analyze_paths(
+            time_grid=time_grid,
+            paths=np.zeros(10),
+        )
