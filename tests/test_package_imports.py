@@ -14,7 +14,7 @@ def test_import_asr_models_bachelier() -> None:
 
     bachelier = importlib.import_module("asr.models.bachelier")
 
-    assert bachelier.__version__ == "1.0.0"
+    assert bachelier.__version__ == "1.1.0"
 
 
 def test_public_import_style() -> None:
@@ -28,13 +28,19 @@ def test_public_import_style() -> None:
 
     from asr.models import bachelier
 
+    assert bachelier.__version__ == "1.1.0"
     assert hasattr(bachelier, "simulate_paths")
+    assert hasattr(bachelier, "simulate_from_config")
     assert hasattr(bachelier, "analyze_paths")
     assert hasattr(bachelier, "call_price")
+    assert hasattr(bachelier, "atm_call_price")
     assert hasattr(bachelier, "call_monte_carlo_price")
     assert hasattr(bachelier, "black_scholes_call_price")
+    assert hasattr(bachelier, "compare_with_black_scholes")
     assert hasattr(bachelier, "run_brownian_motion_experiment")
     assert hasattr(bachelier, "run_option_pricing_experiment")
+    assert hasattr(bachelier, "save_brownian_motion_figure")
+    assert hasattr(bachelier, "save_option_pricing_figure")
 
 
 def test_public_api_basic_usage() -> None:
