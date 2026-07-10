@@ -4,48 +4,63 @@ on:
   push:
     branches:
       - main
-
   pull_request:
     branches:
       - main
-
   workflow_dispatch:
-
-permissions:
-  contents: read
 
 env:
   MPLBACKEND: Agg
 
 jobs:
-  test-and-validate:
-    name: Test and Validate
+  test:
+    name: Test package and reproduce figures
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
+          cache: "pip"
 
-      - name: Install dependencies
+      - name: Upgrade pip
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
 
-      - name: Run test suite
+      - name: Install package with development dependencies
+        run: |
+          python -m pip install -e ".[dev]"
+
+      - name: Verify public package import
+        run: |
+          python - <<'PY'
+          from asr.models import bachelier
+
+          print("ASR Bachelier package version:", bachelier.__version__)
+
+          price = bachelier.call_price(
+              initial_price=100.0,
+              strike=100.0,
+              volatility=2.0,
+              maturity=1.0,
+          )
+
+          print("Bachelier ATM call price:", price)
+          PY
+
+      - name: Run tests
         run: |
           pytest -q
 
-      - name: Run Brownian motion script
+      - name: Reproduce Brownian motion figure
         run: |
           python src/brownian_motion.py
 
-      - name: Run option pricing script
+      - name: Reproduce option pricing figure
         run: |
           python src/option_pricing.py
 
@@ -58,5 +73,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: bachelier-generated-figures
-          path: figures/*.png
-          retention-days: 30
+          path: |
+            figures/fig1_random_walk_martingale.png
+            figures/fig2_option_pricing.png
