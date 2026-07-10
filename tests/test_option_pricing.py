@@ -1,168 +1,300 @@
 """
-Tests for the Bachelier option pricing formula.
+Tests for Bachelier option pricing tools.
 """
+
+from __future__ import annotations
 
 import numpy as np
 import pytest
 from scipy.stats import norm
 
-from option_pricing import (
-    bachelier_call_monte_carlo,
-    bachelier_call_price,
-    black_scholes_call_price,
-    compare_with_black_scholes,
-    compute_atm_scaling,
-)
+from asr.models import bachelier
 
 
-def test_bachelier_at_the_money_formula():
+def test_call_price_at_the_money_formula() -> None:
     """
-    For an at-the-money Bachelier call, strike = P0 and d = 0.
-
-    Therefore:
-
-        C_ATM = sigma sqrt(T) phi(0)
+    The at-the-money Bachelier call price should equal sigma sqrt(T) phi(0).
     """
 
-    p0 = 100.0
-    strike = 100.0
-    sigma = 2.0
-    maturity = 1.0
-
-    price = bachelier_call_price(
-        p0=p0,
-        strike=strike,
-        sigma=sigma,
-        maturity=maturity,
+    price = bachelier.call_price(
+        initial_price=100.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=1.0,
     )
 
-    expected_price = sigma * np.sqrt(maturity) * norm.pdf(0.0)
+    expected_price = 2.0 * norm.pdf(0.0)
 
     assert price == pytest.approx(expected_price)
 
 
-def test_bachelier_price_at_maturity_is_intrinsic_value():
+def test_atm_call_price_matches_general_formula() -> None:
     """
-    At maturity, the call price should be equal to its intrinsic value.
-    """
-
-    assert bachelier_call_price(105.0, 100.0, 2.0, 0.0) == 5.0
-    assert bachelier_call_price(95.0, 100.0, 2.0, 0.0) == 0.0
-
-
-def test_bachelier_zero_volatility_is_intrinsic_value():
-    """
-    If volatility is zero, the option payoff is deterministic.
+    The specialized ATM formula should match the general call formula.
     """
 
-    assert bachelier_call_price(110.0, 100.0, 0.0, 1.0) == 10.0
-    assert bachelier_call_price(90.0, 100.0, 0.0, 1.0) == 0.0
-
-
-def test_monte_carlo_price_is_close_to_closed_form_price():
-    """
-    The Monte Carlo estimate should be close to the closed-form Bachelier price.
-    """
-
-    closed_form_price = bachelier_call_price(
-        p0=100.0,
-        strike=100.0,
-        sigma=2.0,
+    atm_price = bachelier.atm_call_price(
+        volatility=2.0,
         maturity=1.0,
     )
 
-    monte_carlo_price, monte_carlo_se = bachelier_call_monte_carlo(
-        p0=100.0,
+    general_price = bachelier.call_price(
+        initial_price=100.0,
         strike=100.0,
-        sigma=2.0,
+        volatility=2.0,
         maturity=1.0,
-        n_paths=100_000,
+    )
+
+    assert atm_price == pytest.approx(general_price)
+
+
+def test_call_price_at_maturity_equals_intrinsic_value() -> None:
+    """
+    At maturity, the option price should equal intrinsic value.
+    """
+
+    price_in_the_money = bachelier.call_price(
+        initial_price=105.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=0.0,
+    )
+
+    price_out_of_the_money = bachelier.call_price(
+        initial_price=95.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=0.0,
+    )
+
+    assert price_in_the_money == pytest.approx(5.0)
+    assert price_out_of_the_money == pytest.approx(0.0)
+
+
+def test_call_price_with_zero_volatility_equals_intrinsic_value() -> None:
+    """
+    With zero volatility, the Bachelier call price is deterministic.
+    """
+
+    price = bachelier.call_price(
+        initial_price=105.0,
+        strike=100.0,
+        volatility=0.0,
+        maturity=1.0,
+    )
+
+    assert price == pytest.approx(5.0)
+
+
+def test_monte_carlo_price_is_close_to_closed_form_price() -> None:
+    """
+    Monte Carlo price should be close to the analytical Bachelier price.
+    """
+
+    closed_form_price = bachelier.call_price(
+        initial_price=100.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=1.0,
+    )
+
+    monte_carlo_price, standard_error = bachelier.call_monte_carlo_price(
+        initial_price=100.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=1.0,
+        n_paths=300_000,
         seed=7,
     )
 
-    difference = abs(closed_form_price - monte_carlo_price)
-
-    assert difference < 4.0 * monte_carlo_se
+    assert abs(monte_carlo_price - closed_form_price) < 4.0 * standard_error
 
 
-def test_atm_scaling_matches_theoretical_expression():
+def test_monte_carlo_zero_maturity_returns_intrinsic_value() -> None:
     """
-    The general Bachelier formula should match the simplified ATM expression.
+    Monte Carlo pricing at maturity should return deterministic intrinsic value.
     """
 
-    _, atm_prices, theoretical_atm_prices = compute_atm_scaling(
-        p0=100.0,
-        sigma=2.0,
+    price, standard_error = bachelier.call_monte_carlo_price(
+        initial_price=105.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=0.0,
+        n_paths=10_000,
+        seed=7,
     )
 
-    assert np.allclose(atm_prices, theoretical_atm_prices)
+    assert price == pytest.approx(5.0)
+    assert standard_error == pytest.approx(0.0)
 
 
-def test_black_scholes_price_at_maturity_is_intrinsic_value():
+def test_run_option_pricing_experiment() -> None:
     """
-    At maturity, Black-Scholes also reduces to intrinsic value.
-    """
-
-    assert black_scholes_call_price(105.0, 100.0, 0.2, 0.0) == 5.0
-    assert black_scholes_call_price(95.0, 100.0, 0.2, 0.0) == 0.0
-
-
-def test_black_scholes_comparison_returns_matching_arrays():
-    """
-    The comparison function should return arrays of the same length.
+    The high-level option pricing experiment should run successfully.
     """
 
-    strike_grid, bachelier_prices, black_scholes_prices = compare_with_black_scholes()
+    results = bachelier.run_option_pricing_experiment(
+        initial_price=100.0,
+        strike=100.0,
+        volatility=2.0,
+        maturity=1.0,
+        n_paths=200_000,
+        seed=7,
+    )
 
-    assert len(strike_grid) == len(bachelier_prices)
-    assert len(strike_grid) == len(black_scholes_prices)
+    assert set(results) == {
+        "closed_form_price",
+        "monte_carlo_price",
+        "monte_carlo_standard_error",
+        "absolute_difference",
+    }
+
+    assert results["closed_form_price"] > 0.0
+    assert results["monte_carlo_price"] > 0.0
+    assert results["monte_carlo_standard_error"] > 0.0
+    assert results["absolute_difference"] >= 0.0
 
 
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"p0": 100.0, "strike": 100.0, "sigma": -1.0, "maturity": 1.0},
-        {"p0": 100.0, "strike": 100.0, "sigma": 2.0, "maturity": -1.0},
-    ],
-)
-def test_invalid_bachelier_inputs_raise_error(kwargs):
+def test_black_scholes_price_at_maturity() -> None:
     """
-    Invalid Bachelier pricing inputs should raise a ValueError.
+    Black-Scholes price at maturity should equal intrinsic value.
+    """
+
+    price = bachelier.black_scholes_call_price(
+        spot=105.0,
+        strike=100.0,
+        volatility=0.2,
+        maturity=0.0,
+    )
+
+    assert price == pytest.approx(5.0)
+
+
+def test_black_scholes_zero_volatility() -> None:
+    """
+    Black-Scholes with zero volatility should return discounted deterministic payoff.
+    """
+
+    price = bachelier.black_scholes_call_price(
+        spot=100.0,
+        strike=95.0,
+        volatility=0.0,
+        maturity=1.0,
+        rate=0.0,
+    )
+
+    assert price == pytest.approx(5.0)
+
+
+def test_compare_with_black_scholes_returns_consistent_arrays() -> None:
+    """
+    The comparison function should return strike and price arrays of equal length.
+    """
+
+    strike_grid, bachelier_prices, black_scholes_prices = (
+        bachelier.compare_with_black_scholes(
+            spot=100.0,
+            black_scholes_volatility=0.02,
+            maturity=1.0,
+            n_strikes=21,
+        )
+    )
+
+    assert strike_grid.shape == (21,)
+    assert bachelier_prices.shape == (21,)
+    assert black_scholes_prices.shape == (21,)
+    assert np.all(bachelier_prices >= 0.0)
+    assert np.all(black_scholes_prices >= 0.0)
+
+
+def test_invalid_bachelier_pricing_inputs_raise_errors() -> None:
+    """
+    Invalid Bachelier pricing inputs should raise ValueError.
     """
 
     with pytest.raises(ValueError):
-        bachelier_call_price(**kwargs)
-
-
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"spot": 100.0, "strike": 100.0, "volatility": -0.2, "maturity": 1.0},
-        {"spot": 100.0, "strike": 100.0, "volatility": 0.2, "maturity": -1.0},
-        {"spot": 0.0, "strike": 100.0, "volatility": 0.2, "maturity": 1.0},
-        {"spot": 100.0, "strike": 0.0, "volatility": 0.2, "maturity": 1.0},
-    ],
-)
-def test_invalid_black_scholes_inputs_raise_error(kwargs):
-    """
-    Invalid Black-Scholes pricing inputs should raise a ValueError.
-    """
-
-    with pytest.raises(ValueError):
-        black_scholes_call_price(**kwargs)
-
-
-def test_invalid_monte_carlo_sample_size_raises_error():
-    """
-    The Monte Carlo sample size must be strictly positive.
-    """
-
-    with pytest.raises(ValueError):
-        bachelier_call_monte_carlo(
-            p0=100.0,
+        bachelier.call_price(
+            initial_price=100.0,
             strike=100.0,
-            sigma=2.0,
+            volatility=-1.0,
+            maturity=1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.call_price(
+            initial_price=100.0,
+            strike=100.0,
+            volatility=1.0,
+            maturity=-1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.atm_call_price(
+            volatility=-1.0,
+            maturity=1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.call_monte_carlo_price(
+            initial_price=100.0,
+            strike=100.0,
+            volatility=2.0,
             maturity=1.0,
             n_paths=0,
-            seed=7,
         )
+
+
+def test_invalid_black_scholes_inputs_raise_errors() -> None:
+    """
+    Invalid Black-Scholes inputs should raise ValueError.
+    """
+
+    with pytest.raises(ValueError):
+        bachelier.black_scholes_call_price(
+            spot=0.0,
+            strike=100.0,
+            volatility=0.2,
+            maturity=1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.black_scholes_call_price(
+            spot=100.0,
+            strike=0.0,
+            volatility=0.2,
+            maturity=1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.black_scholes_call_price(
+            spot=100.0,
+            strike=100.0,
+            volatility=-0.2,
+            maturity=1.0,
+        )
+
+    with pytest.raises(ValueError):
+        bachelier.black_scholes_call_price(
+            spot=100.0,
+            strike=100.0,
+            volatility=0.2,
+            maturity=-1.0,
+        )
+
+
+def test_invalid_black_scholes_comparison_inputs_raise_errors() -> None:
+    """
+    Invalid Black-Scholes comparison inputs should raise ValueError.
+    """
+
+    with pytest.raises(ValueError):
+        bachelier.compare_with_black_scholes(spot=0.0)
+
+    with pytest.raises(ValueError):
+        bachelier.compare_with_black_scholes(black_scholes_volatility=-0.1)
+
+    with pytest.raises(ValueError):
+        bachelier.compare_with_black_scholes(strike_min=120.0, strike_max=80.0)
+
+    with pytest.raises(ValueError):
+        bachelier.compare_with_black_scholes(n_strikes=1)
