@@ -1,19 +1,67 @@
 # Reproducibility
 
-This document explains how to reproduce the numerical experiments, figures, tests, and package-level examples for the ASR Bachelier research repository.
+This document explains how to reproduce the numerical experiments, figures, tests, package build, and ASR namespace imports for the Bachelier research repository.
 
 ## Project
 
 **Bachelier (1900): Theory of Speculation**  
-**Reproducible Python Package for the Origins of Quantitative Finance**
+**ASR-Compatible Reproducible Python Package for the Origins of Quantitative Finance**
 
 This repository is both:
 
 1. a reproducible research repository; and
-2. an installable Python package exposing:
+2. an installable Python package exposed under the ASR namespace:
 
 ```python
 from asr.models import bachelier
+```
+
+The package distribution name is:
+
+```bash
+pip install asr-theory-of-speculation
+```
+
+The ASR ecosystem registry package is:
+
+```bash
+pip install asr-open-sc
+```
+
+---
+
+## ASR Namespace Strategy
+
+This project uses the shared Alpha Stochastic Research namespace:
+
+```text
+asr
+├── open_sc
+├── models
+│   └── bachelier
+├── risk
+│   └── tail
+├── portfolio
+│   ├── optimization
+│   └── hrp
+├── ml
+│   └── deep_hedging
+└── agents
+    └── trading
+```
+
+This repository provides:
+
+```python
+from asr.models import bachelier
+```
+
+The ecosystem registry is provided separately by:
+
+```python
+import asr.open_sc as asr_sc
+
+asr_sc.print_ecosystem()
 ```
 
 ---
@@ -22,13 +70,15 @@ from asr.models import bachelier
 
 This project follows the Alpha Stochastic Research reproducibility standard:
 
+- installable Python package;
+- shared ASR namespace compatibility;
 - explicit dependencies;
 - fixed random seeds;
 - deterministic figure-generation scripts;
 - tested Python source code;
-- installable package structure;
 - documented public API;
 - notebook-based interactive reproduction;
+- package build validation;
 - citation metadata;
 - open-source licensing.
 
@@ -56,7 +106,7 @@ There are two supported ways to use the repository.
 
 ---
 
-## Option 1 — Package Installation
+## Option 1 — Editable Package Installation
 
 This is the recommended method for research and development.
 
@@ -131,9 +181,43 @@ $env:PYTHONPATH="src"
 python -c "from asr.models import bachelier; print(bachelier.call_price(100, 100, 2, 1))"
 ```
 
-This allows the public API to be used without running `pip install -e .`.
+This allows the public API to be used without running:
 
-However, for a clean and persistent research environment, the editable installation method is preferred.
+```bash
+pip install -e .
+```
+
+However, for a clean and persistent research environment, editable package installation is preferred.
+
+---
+
+## PyPI Installation
+
+Once published on PyPI, the package can be installed with:
+
+```bash
+pip install asr-theory-of-speculation
+```
+
+Then imported with:
+
+```python
+from asr.models import bachelier
+```
+
+The ASR ecosystem registry can be installed separately with:
+
+```bash
+pip install asr-open-sc
+```
+
+and used with:
+
+```python
+import asr.open_sc as asr_sc
+
+asr_sc.print_ecosystem()
+```
 
 ---
 
@@ -154,6 +238,8 @@ pytest
 pandas
 jupyter
 notebook
+build
+twine
 ```
 
 They are listed in:
@@ -189,7 +275,7 @@ PY
 Expected behaviour:
 
 ```text
-The package imports successfully and prints a positive Bachelier call price.
+The package imports successfully and prints version 1.1.0 and a positive Bachelier call price.
 ```
 
 ---
@@ -205,7 +291,7 @@ python src/brownian_motion.py
 This script:
 
 - simulates Bachelier arithmetic Brownian motion;
-- verifies the empirical martingale behaviour;
+- verifies empirical martingale behaviour;
 - compares empirical and theoretical variance;
 - saves the Brownian motion figure.
 
@@ -269,6 +355,7 @@ pytest -q
 The test suite validates:
 
 - public package imports;
+- ASR namespace compatibility;
 - path simulation shape;
 - fixed-seed reproducibility;
 - initial price consistency;
@@ -279,6 +366,34 @@ The test suite validates:
 - Black-Scholes benchmark behaviour;
 - invalid input handling;
 - high-level experiment functions.
+
+---
+
+## Package Build Reproduction
+
+To verify that the repository can be built as a Python package, run:
+
+```bash
+python -m build
+```
+
+This creates distribution files in:
+
+```text
+dist/
+```
+
+Check the generated package metadata with:
+
+```bash
+twine check dist/*
+```
+
+Expected behaviour:
+
+```text
+The package builds successfully and twine check passes.
+```
 
 ---
 
@@ -362,10 +477,12 @@ The GitHub Actions workflow is located at:
 It automatically checks that:
 
 - the package installs correctly;
-- the public import interface works;
+- the public ASR import interface works;
 - the test suite passes;
 - both reproduction scripts run;
-- both figures are generated.
+- both figures are generated;
+- the package builds successfully;
+- distribution metadata passes validation.
 
 ---
 
@@ -422,11 +539,15 @@ python src/option_pricing.py
 
 A successful reproduction means that:
 
-```text
+```bash
 pytest -q
+python src/brownian_motion.py
+python src/option_pricing.py
+python -m build
+twine check dist/*
 ```
 
-passes successfully, and the following files are generated:
+all run successfully, and the following files are generated:
 
 ```text
 figures/fig1_random_walk_martingale.png
@@ -449,7 +570,7 @@ Suggested citation:
 
 ```text
 Alpha Kabinet TOURE and Alpha Stochastic Research.
-Bachelier (1900): Theory of Speculation — Reproducible Python Package.
+Bachelier (1900): Theory of Speculation — ASR-Compatible Reproducible Python Package.
 Alpha Stochastic Research, 2026.
 https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation
 ```
