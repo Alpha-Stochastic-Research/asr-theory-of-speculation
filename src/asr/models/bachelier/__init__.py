@@ -5,7 +5,15 @@ This package provides a reproducible implementation of the arithmetic
 Brownian motion model introduced by Louis Bachelier in 1900, together with
 closed-form option pricing and Monte Carlo validation tools.
 
-Typical usage
+Installation package
+--------------------
+pip install asr-theory-of-speculation
+
+ASR ecosystem package
+---------------------
+pip install asr-open-sc
+
+Python import
 -------------
 >>> from asr.models import bachelier
 >>> price = bachelier.call_price(
@@ -23,14 +31,13 @@ from .pricing import (
     call_price,
     compare_with_black_scholes,
 )
-
 from .process import (
     BachelierPathAnalysis,
     BachelierProcessConfig,
     analyze_paths,
+    simulate_from_config,
     simulate_paths,
 )
-
 from .simulation import (
     run_brownian_motion_experiment,
     run_option_pricing_experiment,
@@ -38,13 +45,14 @@ from .simulation import (
     save_option_pricing_figure,
 )
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     "__version__",
     "BachelierPathAnalysis",
     "BachelierProcessConfig",
     "simulate_paths",
+    "simulate_from_config",
     "analyze_paths",
     "call_price",
     "atm_call_price",
