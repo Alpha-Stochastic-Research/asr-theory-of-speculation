@@ -1,15 +1,17 @@
 """
-Pytest configuration for ASR Theory of Speculation.
+Pytest configuration for the ASR Bachelier research package.
 
-The source files are stored in the `src/` directory.
-This file allows the test suite to import the modules directly.
+The tests import the installable package from the local `src/` directory.
 """
 
-from pathlib import Path
+from __future__ import annotations
+
 import sys
+from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
 
-sys.path.insert(0, str(SRC_DIR))
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
