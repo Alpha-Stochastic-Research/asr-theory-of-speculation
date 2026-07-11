@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "asr-theory-of-speculation"
-version = "1.0.0"
+version = "1.1.0"
 description = "Installable Python package and reproducible research implementation of Bachelier's 1900 Theory of Speculation."
 readme = "README.md"
 requires-python = ">=3.10"
