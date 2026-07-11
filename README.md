@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo.png" alt="Alpha Stochastic Research Logo" width="130">
+<!--<img src="assets/logo.png" alt="Alpha Stochastic Research Logo" width="130">-->
 
 # Bachelier (1900): Theory of Speculation
 
@@ -371,7 +371,7 @@ PY
 
 ## Installation from PyPI
 
-Once published on PyPI, the package can be installed with:
+The package can be installed with:
 
 ```bash
 pip install asr-theory-of-speculation
