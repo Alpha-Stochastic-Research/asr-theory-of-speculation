@@ -2,9 +2,11 @@
 
 <!--<img src="assets/logo.png" alt="Alpha Stochastic Research Logo" width="130">-->
 
-# Bachelier (1900): Theory of Speculation
+# Bachelier’s Theory of Speculation Revisited
 
-### ASR-Compatible Reproducible Python Package for the Origins of Quantitative Finance
+### A Reproducible Reconstruction of the Origins of Quantitative Finance
+
+**Companion research repository and ASR-compatible Python package**
 
 **Alpha Stochastic Research**  
 *Independent Quantitative Finance Research Laboratory*
@@ -18,6 +20,8 @@
 [![Pytest](https://img.shields.io/badge/Pytest-Tested-0A2540?style=for-the-badge)](https://docs.pytest.org/)
 [![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-F37626?style=for-the-badge&logo=jupyter&logoColor=white)](https://jupyter.org/)
 [![License](https://img.shields.io/badge/License-MIT-16A34A?style=for-the-badge)](LICENSE)
+[![Zenodo DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21385499-1682D4?style=for-the-badge&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.21385499)
+![SSRN](https://img.shields.io/badge/SSRN-Submission%20planned-0A2540?style=for-the-badge)
 
 <br>
 
@@ -75,6 +79,26 @@ The repository includes:
 - LaTeX working paper source;
 - citation metadata;
 - open-source documentation.
+
+---
+
+## Research Paper and Publication Status
+
+The accompanying paper is:
+
+> **Bachelier’s Theory of Speculation Revisited: A Reproducible Reconstruction of the Origins of Quantitative Finance**
+
+Current dissemination status:
+
+| Platform | Status | Identifier |
+|---|---|---|
+| Zenodo | Published as an open-access preprint | [DOI: 10.5281/zenodo.21385499](https://doi.org/10.5281/zenodo.21385499) |
+| SSRN | Submission planned for the coming days | Public SSRN link and abstract ID will be added after posting |
+| GitHub | Reproducibility repository and package source | This repository |
+
+The Zenodo record is the current archival version of the preprint. The future SSRN record will provide an additional dissemination channel and will not replace the Zenodo DOI.
+
+The research paper and the software package should be cited separately when both are used.
 
 ---
 
@@ -605,7 +629,15 @@ python src/option_pricing.py
 
 ## Working Paper
 
-The LaTeX source of the accompanying working paper is available in:
+The accompanying preprint is published on Zenodo:
+
+```text
+https://doi.org/10.5281/zenodo.21385499
+```
+
+An SSRN submission is planned for the coming days. The SSRN public link and abstract identifier will be added here once the record is live.
+
+The LaTeX source of the working paper is available in:
 
 ```text
 paper/main.tex
@@ -708,20 +740,52 @@ REPRODUCIBILITY.md
 
 ## Citation
 
-If you use this repository in your research, teaching, or open-source work, please cite it using the metadata provided in:
+The research paper and software package are distinct research outputs.
+
+### Research paper
+
+```text
+TOURE, Alpha Kabinet. “Bachelier’s Theory of Speculation Revisited:
+A Reproducible Reconstruction of the Origins of Quantitative Finance.”
+Alpha Stochastic Research, 2026.
+https://doi.org/10.5281/zenodo.21385499
+```
+
+BibTeX:
+
+```bibtex
+@article{toure2026bachelier,
+  author    = {TOURE, Alpha Kabinet},
+  title     = {Bachelier's Theory of Speculation Revisited:
+               A Reproducible Reconstruction of the Origins
+               of Quantitative Finance},
+  year      = {2026},
+  publisher = {Alpha Stochastic Research},
+  doi       = {10.5281/zenodo.21385499},
+  url       = {https://doi.org/10.5281/zenodo.21385499},
+  note      = {Open-access preprint published on Zenodo;
+               SSRN submission in review}
+}
+```
+
+### Software package
+
+If you use the code or package implementation, cite the repository using the metadata in:
 
 ```text
 CITATION.cff
 ```
 
-Suggested citation:
+Suggested software citation:
 
 ```text
-Alpha Kabinet TOURE and Alpha Stochastic Research.
+TOURE, Alpha Kabinet, and Alpha Stochastic Research.
 Bachelier (1900): Theory of Speculation — ASR-Compatible Reproducible Python Package.
 Alpha Stochastic Research, 2026.
 https://github.com/Alpha-Stochastic-Research/asr-theory-of-speculation
 ```
+
+The SSRN citation will be added only after the SSRN record is publicly available.
 
 ---
 
@@ -829,3 +893,4 @@ research@asr-lab.online
 © 2026 Alpha Stochastic Research
 
 </div>
+
