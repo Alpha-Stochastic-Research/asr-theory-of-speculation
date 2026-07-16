@@ -48,7 +48,7 @@ A Reproducible Reconstruction of the Origins\\
 of Quantitative Finance}}
 
 \author{
-Alpha Kabinet Tour\'e\\
+Alpha Kabinet TOURE\\
 \normalsize Alpha Stochastic Research
 \thanks{
 Alpha Stochastic Research.
@@ -559,11 +559,6 @@ The project is released under the MIT License. Citation metadata is provided thr
 
 The author declares no competing financial interest related to this paper.
 
-% ==================================================================
-\section*{Acknowledgements}
-% ==================================================================
-
-The author acknowledges the historical importance of Louis Bachelier's original contribution to probability, speculation, and financial mathematics. This paper is part of the Alpha Stochastic Research open-source program for reproducible quantitative finance.
 
 % ==================================================================
 \appendix
