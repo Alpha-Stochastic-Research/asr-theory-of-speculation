@@ -19,4 +19,3 @@
 - Added a revised option-pricing script that generates the three-panel figure.
 - Added a pinned reproduction-environment file.
 
-Before the next Zenodo publication, replace the reviewed commit in `paper/main.tex` with the final commit SHA after all revised files are merged.
