@@ -1,0 +1,11 @@
+# Reproduction environment used to regenerate and inspect the revised figures.
+# Regenerate this file from the final release environment before archiving v3.
+numpy==2.3.5
+scipy==1.17.0
+matplotlib==3.10.8
+pytest==9.0.2
+pandas==2.2.3
+notebook==7.5.3
+jupyterlab==4.5.3
+nbconvert==7.17.1
+ipykernel==7.2.0
