@@ -878,7 +878,7 @@ https://github.com/Alpha-Stochastic-Research
 Research contact:
 
 ```text
-research@asr-lab.online
+team@asr-lab.online
 ```
 
 ---
